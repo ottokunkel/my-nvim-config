@@ -21,7 +21,9 @@ return {
       [[ ⣿⡿⣻⠗⠀⢠⠀⠀⠀⠀⠀⠃⠀⠀⠀⠀⢠⣤⣄⢰⣶⢯⣤⡈⠋⠀⠀⠀⠀⠀⠀⠀⠀⠆⠀⣿⣼ ]],
     }
 
-    local header_path = vim.fn.stdpath 'config' .. '/dashboard.txt'
+
+    local dashboard_file = "evangelion.txt"
+    local header_path = vim.fn.stdpath 'config' .. '/dashboards/' .. dashboard_file
     if vim.fn.filereadable(header_path) == 1 then
       dashboard.section.header.val = vim.fn.readfile(header_path)
     else
