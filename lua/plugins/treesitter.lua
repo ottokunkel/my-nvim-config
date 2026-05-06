@@ -9,6 +9,7 @@ return {
       'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
       'python', 'javascript', 'typescript', 'tsx',
       'rust', 'json', 'yaml', 'toml',
+      'latex',
     }
     require('nvim-treesitter').install(parsers)
 

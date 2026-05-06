@@ -14,6 +14,26 @@ return {
   },
   config = function()
     require('telescope').setup {
+      defaults = {
+        vimgrep_arguments = {
+          'rg',
+          '--color=never',
+          '--no-heading',
+          '--with-filename',
+          '--line-number',
+          '--column',
+          '--smart-case',
+          '--hidden',
+          '--glob',
+          '!.git/*',
+        },
+      },
+      pickers = {
+        find_files = {
+          hidden = true,
+          find_command = { 'rg', '--files', '--hidden', '--glob', '!.git/*' },
+        },
+      },
       extensions = {
         ['ui-select'] = { require('telescope.themes').get_dropdown() },
       },
@@ -23,56 +43,72 @@ return {
     pcall(require('telescope').load_extension, 'ui-select')
 
     local builtin = require 'telescope.builtin'
+    local map = vim.keymap.set
 
-    -- Core search (fast, direct)
-    vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = 'Find Files' })
-    vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = 'Grep Files' })
-    vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = 'Word Under Cursor' })
-    vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = 'Buffers' })
-    vim.keymap.set('n', '<leader>sr', builtin.oldfiles, { desc = 'Recent Files' })
-    vim.keymap.set('n', '<leader>ss', builtin.lsp_document_symbols, { desc = 'Symbols (Document)' })
-    vim.keymap.set('n', '<leader>sS', builtin.lsp_dynamic_workspace_symbols, { desc = 'Symbols (Workspace)' })
+    -- Top-level (LazyVim-style)
+    map('n', '<leader><leader>', builtin.find_files, { desc = 'Find Files' })
+    map('n', '<leader>/', builtin.live_grep, { desc = 'Grep (Root Dir)' })
+    map('n', '<leader>:', builtin.command_history, { desc = 'Command History' })
 
-    -- Telescope itself (escape hatch for any picker)
-    vim.keymap.set('n', '<leader>st', builtin.builtin, { desc = 'Telescope Pickers' })
+    -- Find / files (<leader>f)
+    map('n', '<leader>ff', builtin.find_files, { desc = 'Find Files' })
+    map('n', '<leader>fr', builtin.oldfiles, { desc = 'Recent Files' })
+    map('n', '<leader>fb', builtin.buffers, { desc = 'Buffers' })
+    map('n', '<leader>fc', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = 'Find Config File' })
+    map('n', '<leader>fg', builtin.git_files, { desc = 'Find Files (git-files)' })
 
-    -- Less frequent
-    vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = 'Help Tags' })
-    vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = 'Keymaps' })
-    vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = 'Commands' })
-    vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = 'Diagnostics' })
-    vim.keymap.set('n', '<leader>sR', builtin.resume, { desc = 'Resume Last Search' })
-
-    -- Quick access (no s prefix)
-    vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = 'Switch Buffer' })
-
-    -- LSP navigation (kept on gr* convention; not duplicated under <leader>s)
-    vim.keymap.set('n', 'grr', builtin.lsp_references, { desc = 'Goto References' })
-    vim.keymap.set('n', 'gri', builtin.lsp_implementations, { desc = 'Goto Implementation' })
-    vim.keymap.set('n', 'grd', builtin.lsp_definitions, { desc = 'Goto Definition' })
-    vim.keymap.set('n', 'grt', builtin.lsp_type_definitions, { desc = 'Goto Type Definition' })
-    vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { desc = 'Document Symbols' })
-    vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { desc = 'Workspace Symbols' })
-
-    vim.keymap.set('n', '<leader>/', function()
+    -- Search (<leader>s)
+    map('n', '<leader>sg', builtin.live_grep, { desc = 'Grep (Root Dir)' })
+    map({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = 'Word Under Cursor' })
+    map('n', '<leader>sb', function()
       builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
         winblend = 10,
         previewer = false,
       })
-    end, { desc = 'Search in Current Buffer' })
+    end, { desc = 'Buffer Lines' })
+    map('n', '<leader>sB', function()
+      builtin.live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files' }
+    end, { desc = 'Grep Open Buffers' })
 
-    vim.keymap.set(
-      'n',
-      '<leader>s/',
-      function()
-        builtin.live_grep {
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-        }
-      end,
-      { desc = 'Grep Open Files' }
-    )
+    -- Symbols — easy access from multiple paths
+    local code_symbol_kinds = {
+      'class',
+      'constructor',
+      'function',
+      'interface',
+      'method',
+      'struct',
+      'trait',
+    }
 
-    vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = 'Find Neovim Config Files' })
+    map('n', '<leader>sf', function()
+      builtin.treesitter {
+        prompt_title = 'Functions / Classes',
+        symbols = code_symbol_kinds,
+      }
+    end, { desc = 'Functions / Classes' })
+    map('n', '<leader>sT', builtin.treesitter, { desc = 'Treesitter Symbols' })
+    map('n', '<leader>ss', builtin.lsp_document_symbols, { desc = 'Goto Symbol' })
+    map('n', '<leader>sS', builtin.lsp_dynamic_workspace_symbols, { desc = 'Goto Symbol (Workspace)' })
+
+    -- Misc pickers
+    map('n', '<leader>sh', builtin.help_tags, { desc = 'Help Pages' })
+    map('n', '<leader>sk', builtin.keymaps, { desc = 'Keymaps' })
+    map('n', '<leader>sc', builtin.commands, { desc = 'Commands' })
+    map('n', '<leader>sd', builtin.diagnostics, { desc = 'Diagnostics' })
+    map('n', '<leader>sR', builtin.resume, { desc = 'Resume' })
+    map('n', '<leader>sj', builtin.jumplist, { desc = 'Jumplist' })
+    map('n', '<leader>sm', builtin.marks, { desc = 'Marks' })
+    map('n', '<leader>sq', builtin.quickfix, { desc = 'Quickfix List' })
+    map('n', '<leader>s"', builtin.registers, { desc = 'Registers' })
+    map('n', '<leader>st', builtin.builtin, { desc = 'Telescope Pickers' })
+
+    -- LSP navigation (kept on gr* convention)
+    map('n', 'grr', builtin.lsp_references, { desc = 'Goto References' })
+    map('n', 'gri', builtin.lsp_implementations, { desc = 'Goto Implementation' })
+    map('n', 'grd', builtin.lsp_definitions, { desc = 'Goto Definition' })
+    map('n', 'grt', builtin.lsp_type_definitions, { desc = 'Goto Type Definition' })
+    map('n', 'gO', builtin.lsp_document_symbols, { desc = 'Document Symbols' })
+    map('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { desc = 'Workspace Symbols' })
   end,
 }

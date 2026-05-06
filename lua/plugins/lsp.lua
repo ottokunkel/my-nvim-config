@@ -25,6 +25,33 @@ return {
         map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
         map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
         map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+        map('K', vim.lsp.buf.hover, 'Hover Documentation')
+        map('gT', function()
+          local params = vim.lsp.util.make_position_params(0, 'utf-8')
+          vim.lsp.buf_request_all(0, 'textDocument/typeDefinition', params, function(results)
+            local locations = {}
+
+            for _, result in pairs(results) do
+              if result.result then
+                if vim.tbl_islist(result.result) then
+                  vim.list_extend(locations, result.result)
+                else
+                  table.insert(locations, result.result)
+                end
+              end
+            end
+
+            if vim.tbl_isempty(locations) then
+              vim.notify('No type definition found', vim.log.levels.INFO)
+              return
+            end
+
+            vim.lsp.util.preview_location(locations[1], {
+              border = 'rounded',
+              focusable = true,
+            })
+          end)
+        end, 'Peek Type Definition')
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
         if client and client:supports_method('textDocument/documentHighlight', event.buf) then
@@ -70,7 +97,13 @@ return {
       clangd = {},
 
       html = {},
-      cssls = {},
+      cssls = {
+        settings = {
+          css = { lint = { unknownAtRules = 'ignore' } },
+          scss = { lint = { unknownAtRules = 'ignore' } },
+          less = { lint = { unknownAtRules = 'ignore' } },
+        },
+      },
       tailwindcss = {},
 
       jsonls = {},

@@ -10,8 +10,25 @@ return {
         if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then return end
         return 'make install_jsregexp'
       end)(),
-      dependencies = {},
-      opts = {},
+      dependencies = { 'rafamadriz/friendly-snippets' },
+      opts = {
+        enable_autosnippets = true,
+        store_selection_keys = '<Tab>',
+      },
+      config = function(_, opts)
+        local luasnip = require('luasnip')
+        local ft_functions = require('luasnip.extras.filetype_functions')
+
+        opts.load_ft_func = ft_functions.extend_load_ft({
+          markdown = { 'html' },
+        })
+        luasnip.setup(opts)
+        luasnip.filetype_extend('markdown', { 'html' })
+        require('luasnip.loaders.from_lua').lazy_load({
+          paths = { vim.fn.stdpath('config') .. '/lua/snippets' },
+        })
+        require('luasnip.loaders.from_vscode').lazy_load()
+      end,
     },
   },
   ---@module 'blink.cmp'
@@ -31,6 +48,11 @@ return {
 
     sources = {
       default = { 'lsp', 'path', 'snippets' },
+      per_filetype = {
+        markdown = { 'lsp', 'path', 'snippets', 'buffer' },
+        text = { 'path', 'snippets', 'buffer' },
+        gitcommit = { 'path', 'snippets', 'buffer' },
+      },
     },
 
     snippets = { preset = 'luasnip' },

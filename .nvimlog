@@ -1,0 +1,14 @@
+WRN 2026-04-29T11:12:54.637 ?.54647    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/Em3E8N/nvim.54647.0
+WRN 2026-05-05T18:58:12.746 ?.65085    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/MLz1Oh/nvim.65085.0
+WRN 2026-05-05T18:58:17.475 ?.65097    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/r7MEnU/nvim.65097.0
+WRN 2026-05-05T18:58:23.590 ?.65111    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/89sAqj/nvim.65111.0
+WRN 2026-05-05T18:58:48.881 ?.65173    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/Y66LVw/nvim.65173.0
+WRN 2026-05-05T18:59:22.055 ?.65268    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/KtMt2i/nvim.65268.0
+WRN 2026-05-05T18:59:33.833 ?.65283    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/XuNXJ0/nvim.65283.0
+WRN 2026-05-05T18:59:43.349 ?.65318    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/NgY2hP/nvim.65318.0
+WRN 2026-05-06T04:54:22.396 ?.98629    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/QqVoXM/nvim.98629.0
+WRN 2026-05-06T04:55:24.952 ?.98830    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/edMrxV/nvim.98830.0
+WRN 2026-05-06T04:55:59.488 ?.99170    server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/HzxnVR/nvim.99170.0
+WRN 2026-05-06T05:14:12.276 ?.1630     server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/7OulzE/nvim.1630.0
+WRN 2026-05-06T05:14:17.179 ?.1643     server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/uzVnBY/nvim.1643.0
+WRN 2026-05-06T05:23:13.934 ?.6004     server_start:199: Failed to start server: operation not permitted: /var/folders/22/lfl_212d2f77pgq_qf_plcp00000gn/T/nvim.ottokunkel/QZUOP2/nvim.6004.0
