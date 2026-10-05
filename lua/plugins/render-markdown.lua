@@ -30,5 +30,6 @@ return {
     quote = { repeat_linebreak = false },
     pipe_table = { style = 'normal' },
     link = { enabled = false },
+    latex = { enabled = false },
   },
 }

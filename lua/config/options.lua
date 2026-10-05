@@ -4,13 +4,18 @@
 -- [[ Setting options ]]
 vim.o.number = true         --make line numbers default
 vim.o.mouse = 'a'           -- allows mouse 
+vim.opt.mousescroll = 'ver:1,hor:6' -- keep trackpad events to one vertical line
+vim.o.smoothscroll = true   -- scroll wrapped text by screen line
 vim.o.showmode = false      -- shows if it's in insert/visual/normal
 vim.o.cmdheight = 0         -- hide the command line until you type `:` (frees the bottom row for tpipeline)
 -- sync clipboard between OS and NVIM
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 vim.o.linebreak = true   -- wrap long lines at word boundaries when possible
+
+vim.o.wrap = true
 vim.o.breakindent = true -- enable break indent (allows to read long lines -> indents them)
 vim.o.undofile = true     -- enable undo/redo after closing and reopening a file
+vim.o.autoread = true     -- reload unmodified buffers when another process changes the file
 vim.o.ignorecase = true   -- case insensitive
 vim.o.smartcase = true    -- case sentitive if theres capital letters in search term (use \c at end of term to make insentive \C sensitive) 
 vim.o.signcolumn = 'yes'  -- shows git diffs (+/-)
@@ -27,20 +32,20 @@ vim.o.inccommand = 'split'  -- opens a preview as you type in a split window
 vim.o.cursorline = true     -- shows which line you are on (highlights)
 vim.o.scrolloff = 10        -- minimal number of screen lines to keep above and below cursor
 vim.o.confirm = true        -- dialog to confirm change like :q which wouldn't save
-vim.o.termguicolors = true  -- enable 24-bit true color (required for smear-cursor)
+vim.o.termguicolors = true  -- enable 24-bit true color
 
 -- set cursor in terminal
 vim.opt.guicursor = {
-  "n-v-c:block-blinkon500-blinkoff500",   -- normal mode: block
-  "i-ci-ve:ver25-blinkon500-blinkoff500", -- insert mode: vertical bar
-  "r-cr:hor20-blinkon500-blinkoff500",    -- replace mode: underline
-  "t:block-blinkon500-blinkoff500-TermCursor", -- terminal mode: blinking block
+  "n-v-c:block",   -- normal mode: block
+  "i-ci-ve:ver35-iCursor-blinkon0", -- insert mode: visible vertical bar
+  "r-cr:hor20",    -- replace mode: underline
+  "t:block-TermCursor", -- terminal mode: block
 }
 
 
-vim.o.tabstop = 2
-vim.o.shiftwidth = 2
-vim.o.softtabstop = 2
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.softtabstop = 4
 vim.o.expandtab = true
 
 -- Folding: use Tree-sitter when available, but keep files open by default.

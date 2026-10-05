@@ -21,6 +21,8 @@ return {
   opts = {
     backend = 'kitty',
     processor = 'magick_cli',
+    editor_only_render_when_focused = true,
+    tmux_show_only_in_active_window = true,
     integrations = {
       markdown = {
         enabled = true,

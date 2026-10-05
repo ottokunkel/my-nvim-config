@@ -13,9 +13,10 @@ vim.g.loaded_netrwPlugin = 1
 require("config.options")
 require("config.keymaps")
 require("config.autocmds")
+require("config.autosave").setup()
 require("config.lazy")
 
 --vim.o.background = 'dark'
--- colorscheme is applied by lua/plugins/dracula-plus.lua after setup()
+-- colorscheme is applied by lua/plugins/vague.lua after setup()
 
 -- vim: ts=2 sts=2 sw=2 et

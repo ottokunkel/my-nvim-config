@@ -26,12 +26,17 @@ return {
           '--hidden',
           '--glob',
           '!.git/*',
+          '--glob',
+          '!**/node_modules/**',
+        },
+        file_ignore_patterns = {
+          'node_modules/',
         },
       },
       pickers = {
         find_files = {
           hidden = true,
-          find_command = { 'rg', '--files', '--hidden', '--glob', '!.git/*' },
+          find_command = { 'rg', '--files', '--hidden', '--glob', '!.git/*', '--glob', '!**/node_modules/**' },
         },
       },
       extensions = {

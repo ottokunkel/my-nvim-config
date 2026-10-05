@@ -7,26 +7,38 @@ local t = ls.text_node
 local i = ls.insert_node
 local fmta = require('luasnip.extras.fmt').fmta
 
--- Detect whether the cursor sits inside a $$...$$ display math block.
-local function in_display_mathzone()
+-- Detect whether the cursor sits inside $...$ inline math or a $$...$$
+-- display math block. This keeps math snippets available after expanding
+-- `mk` or `dm`, while hiding them from normal prose.
+local function in_mathzone()
   local cursor = vim.api.nvim_win_get_cursor(0)
   local row, col = cursor[1], cursor[2]
   local lines = vim.api.nvim_buf_get_lines(0, 0, row - 1, false)
   table.insert(lines, vim.api.nvim_get_current_line():sub(1, col))
   local text = table.concat(lines, '\n')
-  local toggles, idx, n = 0, 1, #text
+  local in_inline, in_display = false, false
+  local idx, n = 1, #text
+
   while idx <= n do
     local c = text:sub(idx, idx)
     if c == '\\' then
       idx = idx + 2
     elseif text:sub(idx, idx + 1) == '$$' then
-      toggles = toggles + 1
+      if not in_inline then in_display = not in_display end
       idx = idx + 2
+    elseif c == '$' then
+      if not in_display then in_inline = not in_inline end
+      idx = idx + 1
     else
       idx = idx + 1
     end
   end
-  return toggles % 2 == 1
+
+  return in_inline or in_display
+end
+
+local function not_in_mathzone()
+  return not in_mathzone()
 end
 
 -- Math autosnippet, plain text expansion.
@@ -35,7 +47,7 @@ local function ma(trig, expansion, wordTrig)
   return s(
     { trig = trig, snippetType = 'autosnippet', wordTrig = wordTrig == true },
     t(expansion),
-    { condition = in_display_mathzone }
+    { condition = in_mathzone, show_condition = in_mathzone }
   )
 end
 
@@ -44,7 +56,7 @@ local function mn(trig, nodes, wordTrig)
   return s(
     { trig = trig, snippetType = 'autosnippet', wordTrig = wordTrig == true },
     nodes,
-    { condition = in_display_mathzone }
+    { condition = in_mathzone, show_condition = in_mathzone }
   )
 end
 
@@ -53,15 +65,23 @@ local function mw(trig, expansion)
   return ma(trig, expansion, true)
 end
 
-local snippets = {
-  -- Delimiters stay manual so they do not expand while typing prose.
-  s({ trig = 'mk', name = 'Inline math', dscr = 'Markdown inline math span' },
-    fmta('$<>$<>', { i(1), i(0) })),
-  s({ trig = 'dm', name = 'Display math', dscr = 'Markdown display math block' },
-    fmta('$$\n<>\n$$\n<>', { i(1), i(0) })),
-}
+local snippets = {}
 
 local autosnippets = {
+  s(
+    { trig = 'mk', name = 'Inline math', dscr = 'Markdown inline math span', snippetType = 'autosnippet', hidden = true },
+    fmta('$<>$<>', { i(1), i(0) })
+  ),
+  s(
+    { trig = 'dm', name = 'Display math', dscr = 'Markdown display math block', snippetType = 'autosnippet', hidden = true },
+    fmta('$$\n<>\n$$\n<>', { i(1), i(0) })
+  ),
+  s(
+    { trig = '**', name = 'Bold', dscr = 'Markdown bold span', snippetType = 'autosnippet', wordTrig = false, hidden = true },
+    fmta('**<>**<>', { i(1), i(0) }),
+    { condition = not_in_mathzone, show_condition = not_in_mathzone }
+  ),
+
   -- Greek lowercase
   ma('@a', '\\alpha'),
   ma('@b', '\\beta'),

@@ -340,17 +340,46 @@ code.hljs {
 ]]
 
 local function infer_mode(name)
-  return (name:match('dark') or name:match('night')) and 'dark' or 'light'
+  return (name:match('dark') or name:match('night') or name:match('nord')) and 'dark' or 'light'
 end
 
-local function discover_themes(themes_dir)
-  local files = vim.fn.glob(joinpath(themes_dir, '*.css'), false, true)
-  table.sort(files)
+local function normalize_theme_dirs(opts)
+  local dirs = {}
 
+  local function add(dir)
+    if dir and dir ~= '' then
+      table.insert(dirs, vim.fn.expand(dir))
+    end
+  end
+
+  if opts.themes_dirs then
+    if type(opts.themes_dirs) == 'string' then
+      add(opts.themes_dirs)
+    else
+      for _, dir in ipairs(opts.themes_dirs) do
+        add(dir)
+      end
+    end
+  else
+    add(opts.bundled_themes_dir)
+    add(opts.themes_dir)
+  end
+
+  return dirs
+end
+
+local function discover_themes(themes_dirs)
   local themes = {}
-  for _, file in ipairs(files) do
-    local name = vim.fn.fnamemodify(file, ':t:r')
-    themes[name] = file
+  for _, themes_dir in ipairs(themes_dirs) do
+    local files = vim.fn.glob(joinpath(themes_dir, '*.css'), false, true)
+    table.sort(files)
+
+    for _, file in ipairs(files) do
+      local name = vim.fn.fnamemodify(file, ':t:r')
+      if not themes[name] then
+        themes[name] = file
+      end
+    end
   end
 
   return themes
@@ -372,13 +401,13 @@ end
 
 function M.generate_all()
   local opts = M.options or {}
-  local themes_dir = opts.themes_dir
+  local themes_dirs = normalize_theme_dirs(opts)
   local generated_dir = opts.generated_dir
 
   vim.fn.mkdir(generated_dir, 'p')
   M.generated = {}
 
-  for name, file in pairs(discover_themes(themes_dir)) do
+  for name, file in pairs(discover_themes(themes_dirs)) do
     local output = joinpath(generated_dir, name .. '.css')
     if output_is_current(file, output) then
       M.generated[name] = output
@@ -450,7 +479,8 @@ end
 
 function M.setup(opts)
   M.options = vim.tbl_extend('force', {
-    default_theme = vim.g.markdown_preview_typora_theme or vim.env.MARKDOWN_PREVIEW_TYPORA_THEME or 'github',
+    default_theme = vim.g.markdown_preview_typora_theme or vim.env.MARKDOWN_PREVIEW_TYPORA_THEME or 'nord',
+    bundled_themes_dir = joinpath(vim.fn.stdpath('config'), 'themes', 'markdown-preview'),
     generated_dir = joinpath(vim.fn.stdpath('cache'), 'markdown-preview-typora'),
     themes_dir = vim.fn.expand('~/Library/Application Support/abnerworks.Typora/themes'),
   }, opts or {})

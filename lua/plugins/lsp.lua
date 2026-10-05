@@ -10,6 +10,14 @@ return {
     },
     'mason-org/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
+    {
+      'folke/lazydev.nvim',
+      opts = {
+        library = {
+          { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        },
+      },
+    },
 
     { 'j-hui/fidget.nvim', opts = {} },
   },
@@ -25,7 +33,7 @@ return {
         map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
         map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
         map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-        map('K', vim.lsp.buf.hover, 'Hover Documentation')
+        map('gK', vim.lsp.buf.hover, 'Hover Documentation')
         map('gT', function()
           local params = vim.lsp.util.make_position_params(0, 'utf-8')
           vim.lsp.buf_request_all(0, 'textDocument/typeDefinition', params, function(results)
@@ -53,13 +61,33 @@ return {
           end)
         end, 'Peek Type Definition')
 
+        local function cursor_is_on_tag_capture(buf)
+          local cursor = vim.api.nvim_win_get_cursor(0)
+          local ok, captures = pcall(vim.treesitter.get_captures_at_pos, buf, cursor[1] - 1, cursor[2])
+          if not ok then return false end
+
+          for _, capture in ipairs(captures) do
+            local name = type(capture) == 'table' and capture.capture or capture
+            if type(name) == 'string' and name:match '^tag' then return true end
+          end
+
+          return false
+        end
+
         local client = vim.lsp.get_client_by_id(event.data.client_id)
         if client and client:supports_method('textDocument/documentHighlight', event.buf) then
           local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
           vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
             buffer = event.buf,
             group = highlight_augroup,
-            callback = vim.lsp.buf.document_highlight,
+            callback = function()
+              if cursor_is_on_tag_capture(event.buf) then
+                vim.lsp.buf.clear_references()
+                return
+              end
+
+              vim.lsp.buf.document_highlight()
+            end,
           })
 
           vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
@@ -97,6 +125,7 @@ return {
       clangd = {},
 
       html = {},
+      emmet_language_server = {},
       cssls = {
         settings = {
           css = { lint = { unknownAtRules = 'ignore' } },

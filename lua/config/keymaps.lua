@@ -21,14 +21,17 @@ map('n', '<leader>cd', vim.diagnostic.open_float, { desc = 'Line Diagnostics' })
 -- File / save / quit (LazyVim-style)
 map({ 'i', 'x', 'n', 's' }, '<C-s>', '<cmd>w<cr><esc>', { desc = 'Save File' })
 map('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit All' })
+map('n', '<leader>ta', function() require('config.autosave').toggle() end, { desc = 'Toggle Autosave' })
 
 -- Better up/down on wrapped lines
 map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true, desc = 'Down' })
 map({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true, desc = 'Up' })
 
--- Keep cursor centered on half-page jumps and search nav
-map('n', '<C-d>', '<C-d>zz', { desc = 'Half page down' })
-map('n', '<C-u>', '<C-u>zz', { desc = 'Half page up' })
+-- Use native half-page scrolling without a second recentering movement.
+map('n', '<C-d>', '<C-d>', { desc = 'Half page down' })
+map('n', '<C-u>', '<C-u>', { desc = 'Half page up' })
+map('n', 'J', '<C-d>', { desc = 'Half page down' })
+map('n', 'K', '<C-u>', { desc = 'Half page up' })
 map('n', 'n', 'nzzzv', { desc = 'Next search result' })
 map('n', 'N', 'Nzzzv', { desc = 'Prev search result' })
 
@@ -106,4 +109,3 @@ map('n', '<leader>bd', function()
     vim.cmd('bdelete ' .. cur)
   end
 end, { desc = 'Close Buffer (Alpha if last)' })
-

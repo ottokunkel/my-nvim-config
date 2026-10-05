@@ -3,16 +3,10 @@ return {
   lazy = false,
   keys = {
     { '<leader>-', '<cmd>Oil<cr>', desc = 'Oil (parent dir)' },
-    { '<leader>e', '<cmd>Oil<cr>', desc = 'Open File Explorer' },
     {
       '<leader>_',
       function() require('oil').open(vim.fn.getcwd()) end,
       desc = 'Oil (cwd)',
-    },
-    {
-      '<leader>E',
-      function() require('oil').open(vim.fn.getcwd()) end,
-      desc = 'Open File Explorer (cwd)',
     },
   },
   opts = {

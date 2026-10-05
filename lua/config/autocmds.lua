@@ -10,6 +10,16 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })
 
+-- Pick up edits made by external tools (for example, an AI coding agent).
+-- `autoread` reloads clean buffers; modified buffers still get Neovim's
+-- conflict warning instead of having local work overwritten.
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI' }, {
+  desc = 'Reload files changed outside Neovim',
+  group = vim.api.nvim_create_augroup('external-file-refresh', { clear = true }),
+  callback = function()
+    if vim.fn.mode() ~= 'c' then vim.cmd 'checktime' end
+  end,
+})
 
 -- [ INSTALLS LAZYVIM PLUGIN MANAGER ] -- 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -43,6 +53,19 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 style_markdown_inline_code()
 
 
+-- Keep the mode cursors visible after any colorscheme changes.
+local function style_mode_cursors()
+  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false })
+  local normal_bg = normal.bg or 0x141415
+  local normal_fg = normal.fg or 0xcdcdcd
 
+  vim.api.nvim_set_hl(0, "Cursor", { fg = normal_bg, bg = normal_fg })
+  vim.api.nvim_set_hl(0, "iCursor", { fg = normal_bg, bg = 0xff9e64 })
+end
 
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("mode-cursor-style", { clear = true }),
+  callback = style_mode_cursors,
+})
+style_mode_cursors()
 
