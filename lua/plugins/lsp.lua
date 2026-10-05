@@ -113,8 +113,6 @@ return {
 
     ---@type table<string, vim.lsp.Config>
     local servers = {
-      stylua = {},
-
       pyright = {},
       ruff = {},
 
@@ -173,8 +171,18 @@ return {
       },
     }
 
-    local ensure_installed = vim.tbl_keys(servers or {})
-    vim.list_extend(ensure_installed, {})
+    -- Server activation is handled explicitly below.
+    require('mason-lspconfig').setup { automatic_enable = false }
+
+    local ensure_installed = vim.tbl_keys(servers)
+    for i, name in ipairs(ensure_installed) do
+      if name == 'clangd' then
+        -- Use a system clangd on platforms without a Mason binary, such as Linux ARM64.
+        ensure_installed[i] = { name, condition = function() return vim.fn.executable 'clangd' == 0 end }
+      end
+    end
+    -- Formatters belong in Mason's install list, not the LSP server table.
+    vim.list_extend(ensure_installed, { 'stylua' })
 
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
